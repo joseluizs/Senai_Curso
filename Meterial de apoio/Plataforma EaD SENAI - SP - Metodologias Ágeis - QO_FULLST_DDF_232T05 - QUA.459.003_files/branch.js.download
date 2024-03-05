@@ -1,0 +1,76 @@
+//put branch changes here and include in JS files load list
+window.Branch = {
+	lng: function (string)
+	{
+		if (Blsm && Blsm.lang && Blsm.lang.current === 'pt_BR')
+		{
+			switch (string)
+			{
+				case 'send scores between 0 to 10':
+					return 'enviar pontuações entre 0 a 10';
+				case 'send unweighted scores':
+					return 'enviar pontuações não ponderadas';
+				case 'student guide':
+					return 'guia do aluno';
+				case 'instructor guide':
+					return 'guia do instrutor';
+				case 'power manager guide':
+					return 'guia do gestor avançado';
+				case 'virtual library':
+					return 'estante virtual';
+				case 'close date cannot be more than 18 months after open date':
+					return 'a data de fechamento não pode ser superior a 18 meses após a data de abertura';
+			}
+		}
+		return string;
+	},
+	TotvsServerConfig: () =>
+	{
+		const options = [
+			['', lng('off').caps()],
+			['2', 'SESI (2)'],
+			['3', 'SENAI (3)'],
+			['1:sesi', 'SESI - FIEMG (1)'],
+			['9:senai', 'SENAI - FIEMG (9)'],
+			['1:senai', 'SENAI - CETIQT (1)'],
+			['4:senai', 'SENAI - RIO GRANDE DO SUL (4)']
+		];
+		return {
+			type: 'section',
+			sid: 'totvs',
+			title: lng('Totvs outgoing api'),
+			fields: [
+				{type: 'select', name: 'totvs[codcoligada]', /*value: data.totvs && data.totvs.codcoligada, */label: 'codcoligada', 'options': options},
+				{type: 'text', disable: values => !values.get('totvs[codcoligada]'), name: 'totvs[user]', /*value: data.totvs && data.totvs.user, */label: lng('user')},
+				{type: 'text', disable: values => !values.get('totvs[codcoligada]'), name: 'totvs[password]', /*value: data.totvs && data.totvs.password, */label: lng('password')},
+				{type: 'text', disable: values => !values.get('totvs[codcoligada]'), name: 'totvs[location]', /*value: data.totvs && data.totvs.location, */label: lng('url')},
+				{type: 'checkbox', disable: values => !values.get('totvs[codcoligada]'), name: 'totvs[scoring_method]', label: window.Branch.lng('send scores between 0 to 10'), checkboxValue: '1to10', /*value: data.totvs.scoring_method === '1to10'*/},
+				{type: 'checkbox', disable: values => !values.get('totvs[codcoligada]'), name: 'totvs[unweighted_scores]', label: window.Branch.lng('send unweighted scores'), checkboxValue: '1', /*value: data.totvs.unweighted_scores === '1'*/},
+				{
+					type: 'section',
+					title: lng('Pronatec portal outgoing api'),
+					fields: [
+						{type: 'text', name: 'pronatec_portal[user]', /*value: data.pronatec_portal && data.pronatec_portal.user, */label: lng('user')},
+						{type: 'text', name: 'pronatec_portal[token]', /*value: data.pronatec_portal && data.pronatec_portal.token, */label: lng('token')}
+					]
+				}
+			]
+		};
+	},
+	checkboxOn: () => 1,
+	AssignmentExternalID: function (basiceFields, data)
+	{
+		data.external_id = data.assignment_external_id;
+		basiceFields.push({type: 'text', name: 'external_id', label: lng('external id'), maxlength: 30});
+	},
+	isAdmin: () => Blsm.user.isAdmin,
+	helpLinks: (help_links) =>
+	{
+		help_links.push({href: 'https://www.t2kaluno.com', label: Branch.lng('student guide').caps(false)});
+		if (Blsm.user.isManager)
+			help_links.push({href: 'https://www.t2kinstrutor.com', label: Branch.lng('instructor guide').caps(false)});
+		if (Blsm.user.isPowerManager)
+			help_links.push({href: 'https://www.t2kgestoravancado.com', label: Branch.lng('power manager guide').caps(false)});
+	},
+	NotificationInterval: () => 300e3,
+};
