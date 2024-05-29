@@ -1,61 +1,49 @@
-﻿using System;
-using System.Reflection;
-namespace Atividade
+﻿using System.Data.SqlClient;
+
+namespace ProjetoClientes;
+
+class Program
 {
-    class Program
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
+        Console.WriteLine("Hello, Luiz!");
+
+        try
         {
-            float val_pag;
-            Console.WriteLine("Infome o Nome : ");
-            string var_nome = Console.ReadLine();
-            Console.WriteLine("Infome o Endereço : ");
-            string var_endereco = Console.ReadLine();
-            Console.WriteLine("Infome se é Física(f) ou Jurídica(j) : ");
-            string var_tipo = Console.ReadLine();
-            if (var_tipo == "f")
+            //Executar
+            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder(
+                "User Id=sa;Password=85689398;"+
+                "Server=localhost\\SQLEXPRESS;" +
+                "Database=projetoclientes;" +
+                "Trusted_Connection=False;"
+            );
+
+            using (SqlConnection conexao = new SqlConnection(builder.ConnectionString))
             {
-                Pessoa_Fisica pf = new Pessoa_Fisica();
-                pf.nome = var_nome;
-                pf.endereco = var_endereco;
-                Console.WriteLine("Informe o CPF: ");
-                pf.cpf = Console.ReadLine();
-                Console.WriteLine("Digite o RG: ");
-                pf.rg = Console.ReadLine();
-                Console.WriteLine("Informe o valor compra: ");
-                val_pag = float.Parse(Console.ReadLine());
-                pf.Pagar_Imposto(val_pag);
-                Console.WriteLine("------- Pessoa Física ------- ");
-                Console.WriteLine("Nome ..........: " + pf.nome);
-                Console.WriteLine("Endereço ......: " + pf.endereco);
-                Console.WriteLine("CPF ...........: " + pf.cpf);
-                Console.WriteLine("RG ............: " + pf.rg);
-                Console.WriteLine("Valor de Compra: " + pf.valor.ToString("C"));
-                Console.WriteLine("Imposto .......: " + pf.valor_imposto.ToString("C"));
-                Console.WriteLine("Total a Pagar .: " + pf.total.ToString("C"));
+                string sql = "Select * from clientes";
+                using (SqlCommand comando = new SqlCommand(sql, conexao))
+                {
+                    conexao.Open();
+
+                    using (SqlDataReader leitor = comando.ExecuteReader())
+                    {
+                        while (leitor.Read())
+                        {
+                            System.Console.WriteLine("id: {0}", leitor.GetSqlInt32(0));
+                            System.Console.WriteLine("nome: {0}", leitor.GetSqlString(1));
+                            System.Console.WriteLine("email: {0}",leitor.GetSqlString(2));
+                        }
+                    }
+                }
+
+
             }
-            if
-            (var_tipo == "j")
-            {
-                Pessoa_Juridica pj = new Pessoa_Juridica();
-                pj.nome = var_nome;
-                pj.endereco = var_endereco;
-                Console.WriteLine("Informe o CNPJ: ");
-                pj.cnpj = Console.ReadLine();
-                Console.WriteLine("Informe o IE: ");
-                pj.ie = Console.ReadLine();
-                Console.WriteLine("Informe o valor compra: ");
-                val_pag = float.Parse(Console.ReadLine());
-                pj.Pagar_Imposto(val_pag);
-                Console.WriteLine("------- Pessoa Jurídica ------- ");
-                Console.WriteLine("Nome ..........: " + pj.nome);
-                Console.WriteLine("Endereço ......: " + pj.endereco);
-                Console.WriteLine("CNPJ ..........: " + pj.cnpj);
-                Console.WriteLine("IE ............: " + pj.ie);
-                Console.WriteLine("Valor de Compra: " + pj.valor.ToString("C"));
-                Console.WriteLine("Imposto .......: " + pj.valor_imposto.ToString("C"));
-                Console.WriteLine("Total a Pagar .: " + pj.total.ToString("C"));
-            }
+
+        }
+        catch (Exception e)
+        {
+            //exception
+            System.Console.WriteLine("Erro: " + e.ToString());
         }
     }
 }
